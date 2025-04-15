@@ -7,25 +7,25 @@ import numpy as np
 import torch
 import pandas as pd
 
-# Load CSV files
+# Load CSV files once
 disease_info = pd.read_csv('disease_info.csv', encoding='cp1252')
 supplement_info = pd.read_csv('supplement_info.csv', encoding='cp1252')
 
-# Load trained model
-model = CNN.CNN(39)
-model.load_state_dict(torch.load("plant_disease_model_1_latest.pt"))
-model.eval()
+# Create Flask app
+app = Flask(__name__)
 
-# Prediction function
+# Prediction function with lazy model loading
 def prediction(image_path):
+    # Lazy-load model
+    model = CNN.CNN(39)
+    model.load_state_dict(torch.load("plant_disease_model_1_latest.pt", map_location=torch.device("cpu")))
+    model.eval()
+
     image = Image.open(image_path).convert('RGB')
     image = image.resize((224, 224))
     input_data = TF.to_tensor(image).view((-1, 3, 224, 224))
     output = model(input_data).detach().numpy()
     return np.argmax(output)
-
-# Create Flask app
-app = Flask(__name__)
 
 # Prediction API route
 @app.route('/predict', methods=['POST'])
