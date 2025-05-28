@@ -6,6 +6,7 @@ import CNN
 import numpy as np
 import torch
 import pandas as pd
+from flask_cors import CORS
 
 # Load CSV files once
 disease_info = pd.read_csv('disease_info.csv', encoding='cp1252')
@@ -13,6 +14,7 @@ supplement_info = pd.read_csv('supplement_info.csv', encoding='cp1252')
 
 # Create Flask app
 app = Flask(__name__)
+CORS(app)
 
 # Prediction function with lazy model loading
 def prediction(image_path):
@@ -54,4 +56,4 @@ def predict_api():
 
 # Run server
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5000)))
+    app.run(host='0.0.0.0', port=int(os.environ.get("PORT", 5001)))
